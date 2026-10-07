@@ -1,3 +1,16 @@
+// ===== BOTÓN DETALLES - CAMBIO DE IMAGEN =====
+document.querySelectorAll('.btn-detalles').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const producto = this.closest('.producto');
+        const imgsContainer = producto.querySelector('.producto-imgs');
+        if (imgsContainer) {
+            imgsContainer.classList.toggle('show-back');
+            this.classList.toggle('active');
+        }
+    });
+});
+
 // ===== TEMA DIURNO/NOCTURNO =====
 function toggleTheme() {
     const html = document.documentElement;
