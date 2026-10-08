@@ -632,7 +632,7 @@ section {
 .producto .info h3 {
     color: var(--text-primary);
     margin-bottom: 0.8rem;
-    font-size: 1.1rem;
+    font-size: 1.3rem;
 }
 
 .producto .info .precio {
@@ -651,7 +651,7 @@ section {
     box-sizing: border-box;
     background: linear-gradient(135deg, rgba(255, 107, 53, 0.50), rgba(0, 212, 255, 0.50));
     border: 1px solid #000;
-    color: #000;
+    color: #fff;
     border-radius: 8px;
     text-decoration: none;
     font-size: 0.9rem;
