@@ -1,3 +1,42 @@
+// ===== VISOR DE IMÁGENES - MANATEC =====
+const manatecViewer = document.getElementById('viewer-img');
+const manatecThumbs = document.querySelectorAll('.manatec-thumb');
+const viewerPrev = document.querySelector('.viewer-prev');
+const viewerNext = document.querySelector('.viewer-next');
+
+let currentIndex = 0;
+
+if (manatecViewer && manatecThumbs.length > 0) {
+    // Mostrar la primera imagen por defecto
+    manatecViewer.src = manatecThumbs[0].src;
+    manatecViewer.alt = manatecThumbs[0].alt;
+    
+    manatecThumbs.forEach((img, index) => {
+        img.addEventListener('click', function() {
+            currentIndex = index;
+            manatecViewer.src = this.src;
+            manatecViewer.alt = this.alt;
+        });
+    });
+    
+    // Botones de navegación
+    if (viewerPrev) {
+        viewerPrev.addEventListener('click', function() {
+            currentIndex = (currentIndex - 1 + manatecThumbs.length) % manatecThumbs.length;
+            manatecViewer.src = manatecThumbs[currentIndex].src;
+            manatecViewer.alt = manatecThumbs[currentIndex].alt;
+        });
+    }
+    
+    if (viewerNext) {
+        viewerNext.addEventListener('click', function() {
+            currentIndex = (currentIndex + 1) % manatecThumbs.length;
+            manatecViewer.src = manatecThumbs[currentIndex].src;
+            manatecViewer.alt = manatecThumbs[currentIndex].alt;
+        });
+    }
+}
+
 // ===== BOTÓN DETALLES - CAMBIO DE IMAGEN =====
 document.querySelectorAll('.btn-detalles').forEach(btn => {
     btn.addEventListener('click', function(e) {
