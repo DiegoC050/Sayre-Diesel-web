@@ -800,19 +800,31 @@ section {
 #lineas-manatec {
     background: var(--bg-primary);
     max-width: 100%;
-    padding: 1.6rem 2rem 5rem;
+    padding: 1.6rem 2rem 1.6rem;
     scroll-margin-top: 40px;
 }
 
 #lineas-manatec .contenido {
     max-width: 1200px;
     margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 50rem;
+}
+
+#lineas-manatec .section-title,
+#lineas-manatec .section-subtitle {
+    flex-shrink: 0;
+}
+
+#lineas-manatec .manatec-grid {
+    margin-top: auto;
 }
 
 .manatec-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 2rem;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1rem;
 }
 
 .manatec-item {
@@ -832,14 +844,24 @@ section {
 
 .manatec-img {
     width: 100%;
-    height: 220px;
+    height: 130px;
     background: rgba(128, 128, 128, 0.15);
     border-bottom: 1px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.manatec-img img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
 }
 
 .manatec-item .info {
-    padding: 1.5rem;
-    min-height: 120px;
+    padding: 0.8rem;
+    min-height: 70px;
 }
 
 /* ===== NOSOTROS ===== */
