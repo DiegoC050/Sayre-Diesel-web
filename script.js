@@ -6,24 +6,24 @@ const viewerNext = document.querySelector('.viewer-next');
 
 let currentIndex = 0;
 
+// Imagen central de cada posición: si la miniatura tiene "data-center",
+// el centro muestra esa imagen (ej. img01-central) en vez de la miniatura
+function imagenCentral(index) {
+    const thumb = manatecThumbs[index];
+    if (!thumb) return '';
+    return thumb.dataset.center || thumb.src;
+}
+
 if (manatecViewer && manatecThumbs.length > 0) {
     // Mostrar la primera imagen por defecto
-    manatecViewer.src = manatecThumbs[0].src;
+    manatecViewer.src = imagenCentral(0);
     manatecViewer.alt = manatecThumbs[0].alt;
-    
-    manatecThumbs.forEach((img, index) => {
-        img.addEventListener('click', function() {
-            currentIndex = index;
-            manatecViewer.src = this.src;
-            manatecViewer.alt = this.alt;
-        });
-    });
-    
+
     // Botones de navegación
     if (viewerPrev) {
         viewerPrev.addEventListener('click', function() {
             currentIndex = (currentIndex - 1 + manatecThumbs.length) % manatecThumbs.length;
-            manatecViewer.src = manatecThumbs[currentIndex].src;
+            manatecViewer.src = imagenCentral(currentIndex);
             manatecViewer.alt = manatecThumbs[currentIndex].alt;
         });
     }
@@ -31,7 +31,7 @@ if (manatecViewer && manatecThumbs.length > 0) {
     if (viewerNext) {
         viewerNext.addEventListener('click', function() {
             currentIndex = (currentIndex + 1) % manatecThumbs.length;
-            manatecViewer.src = manatecThumbs[currentIndex].src;
+            manatecViewer.src = imagenCentral(currentIndex);
             manatecViewer.alt = manatecThumbs[currentIndex].alt;
         });
     }
