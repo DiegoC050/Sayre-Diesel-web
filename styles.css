@@ -862,6 +862,7 @@ section {
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    position: relative;
 }
 
 .manatec-img img {
@@ -914,6 +915,24 @@ section {
     background: linear-gradient(135deg, rgba(255, 107, 53, 0.85), rgba(0, 212, 255, 0.85));
     transform: translateY(-5rem) scale(1.05);
     box-shadow: 0 8px 20px rgba(255, 107, 53, 0.4);
+}
+
+/* Botones en los extremos del carrusel (sin loop) */
+.viewer-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Durante la animación del carrusel las imágenes se deslizan fuera de su ventanita */
+.manatec-grid.animando .manatec-item,
+.manatec-grid.animando .manatec-img {
+    overflow: visible;
+}
+
+.manatec-grid.animando .manatec-img img {
+    position: relative;
+    z-index: 5;
 }
 
 .manatec-item .info {

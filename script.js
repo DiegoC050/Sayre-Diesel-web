@@ -1,38 +1,187 @@
-// ===== VISOR DE IMÁGENES - MANATEC =====
+// ===== CARRUSEL DE IMÁGENES - MANATEC =====
 const manatecViewer = document.getElementById('viewer-img');
-const manatecThumbs = document.querySelectorAll('.manatec-thumb');
+const manatecGrid = document.querySelector('.manatec-grid');
+const manatecItems = document.querySelectorAll('.manatec-item');
+const manatecImgs = Array.from(document.querySelectorAll('.manatec-thumb'));
 const viewerPrev = document.querySelector('.viewer-prev');
 const viewerNext = document.querySelector('.viewer-next');
 
-let currentIndex = 0;
+const TOTAL_IMGS = manatecImgs.length; // 5 imágenes
+const VENTANA_CENTRO = 4;              // la ventanita grande (1 a 7)
+const DURACION_ANIM = 800;             // ms
 
-// Imagen central de cada posición: si la miniatura tiene "data-center",
-// el centro muestra esa imagen (ej. img01-central) en vez de la miniatura
-function imagenCentral(index) {
-    const thumb = manatecThumbs[index];
-    if (!thumb) return '';
-    return thumb.dataset.center || thumb.src;
+let activeIndex = 0;                   // arranca con img02 en la ventanita 4
+let renderToken = 0;                   // cancela limpiezas de renders anteriores
+const animSalida = new Map();          // img -> animación de desvanecido de salida
+
+// La ventanita k (1..7) muestra la imagen manatecImgs[activeIndex + k - VENTANA_CENTRO].
+// Las que quedan fuera de rango no se muestran (el carrusel no hace loop).
+function asignarImagenes() {
+    // Sacar todas las imágenes de las ventanas
+    manatecImgs.forEach(img => {
+        if (animSalida.has(img)) {
+            animSalida.get(img).cancel();
+            animSalida.delete(img);
+            img.style.position = '';
+            img.style.left = '';
+            img.style.top = '';
+            img.style.width = '';
+            img.style.height = '';
+            img.style.zIndex = '';
+        }
+        img.remove();
+    });
+    // Ubicar cada imagen en su ventanita
+    manatecItems.forEach((item, k) => {
+        const i = activeIndex + (k + 1) - VENTANA_CENTRO;
+        const img = manatecImgs[i];
+        if (img) {
+            item.querySelector('.manatec-img').appendChild(img);
+        }
+    });
 }
 
-if (manatecViewer && manatecThumbs.length > 0) {
-    // Mostrar la primera imagen por defecto
-    manatecViewer.src = imagenCentral(0);
-    manatecViewer.alt = manatecThumbs[0].alt;
+// El visor grande siempre refleja la imagen de la ventanita 4:
+// si esa miniatura tiene "data-center" (ej. img02-central), se muestra esa;
+// si no, se muestra la propia miniatura.
+function actualizarVisor() {
+    const img = manatecImgs[activeIndex];
+    if (!img || !manatecViewer) return;
+    manatecViewer.src = img.dataset.center || img.src;
+    manatecViewer.alt = img.alt;
+}
 
-    // Botones de navegación
+// Sin loop: los botones se desactivan en los extremos
+function actualizarBotones() {
+    if (viewerPrev) viewerPrev.disabled = (activeIndex === 0);
+    if (viewerNext) viewerNext.disabled = (activeIndex === TOTAL_IMGS - 1);
+}
+
+function renderCarousel(animar) {
+    const token = ++renderToken;
+
+    // Limpiar restos de animaciones anteriores
+    manatecGrid.classList.remove('animando');
+    manatecImgs.forEach(img => {
+        img.style.transition = '';
+        img.style.transform = '';
+        img.style.zIndex = '';
+    });
+
+    if (!animar) {
+        asignarImagenes();
+        actualizarVisor();
+        actualizarBotones();
+        return;
+    }
+
+    // FLIP: guardar posiciones actuales de las imágenes visibles
+    const rectosPrevios = new Map();
+    const padresPrevios = new Map();
+    manatecImgs.forEach(img => {
+        if (img.parentElement) {
+            rectosPrevios.set(img, img.getBoundingClientRect());
+            padresPrevios.set(img, img.parentElement);
+        }
+    });
+
+    // Mover las imágenes a sus nuevas ventanas
+    asignarImagenes();
+
+    manatecGrid.classList.add('animando');
+
+    manatecImgs.forEach(img => {
+        const rectoPrevio = rectosPrevios.get(img);
+        if (!img.parentElement) {
+            // Acaba de ocultarse: re-insertarla de forma absoluta sobre su
+            // lugar anterior y desvanecerla (sin ocupar espacio en la ventana)
+            const padre = padresPrevios.get(img);
+            if (padre && rectoPrevio) {
+                const padreRect = padre.getBoundingClientRect();
+                padre.appendChild(img);
+                img.style.position = 'absolute';
+                img.style.left = (rectoPrevio.left - padreRect.left) + 'px';
+                img.style.top = (rectoPrevio.top - padreRect.top) + 'px';
+                img.style.width = rectoPrevio.width + 'px';
+                img.style.height = rectoPrevio.height + 'px';
+                img.style.zIndex = '10';
+                const a = img.animate(
+                    [{ opacity: 1 }, { opacity: 0 }],
+                    { duration: 280, easing: 'ease-in' }
+                );
+                animSalida.set(img, a);
+                a.onfinish = () => {
+                    animSalida.delete(img);
+                    img.style.position = '';
+                    img.style.left = '';
+                    img.style.top = '';
+                    img.style.width = '';
+                    img.style.height = '';
+                    img.style.zIndex = '';
+                    img.remove();
+                };
+            }
+            return;
+        }
+        if (!rectoPrevio) {
+            // Acaba de aparecer: fundido de entrada
+            img.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
+            return;
+        }
+        // Sigue visible: deslizar desde su posición anterior (FLIP)
+        const ultima = img.getBoundingClientRect();
+        const dx = rectoPrevio.left - ultima.left;
+        const dy = rectoPrevio.top - ultima.top;
+        const sx = ultima.width ? rectoPrevio.width / ultima.width : 1;
+        const sy = ultima.height ? rectoPrevio.height / ultima.height : 1;
+        img.style.zIndex = '10';
+        img.style.transition = 'none';
+        img.style.transform = `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`;
+    });
+
+    // Forzar reflow para que el navegador aplique el estado inicial
+    void manatecGrid.offsetHeight;
+
+    manatecImgs.forEach(img => {
+        if (!img.parentElement || !rectosPrevios.has(img)) return;
+        img.style.transition = `transform ${DURACION_ANIM}ms cubic-bezier(0.22, 1, 0.36, 1)`;
+        img.style.transform = '';
+    });
+
+    // Limpiar al terminar la animación
+    setTimeout(() => {
+        if (token !== renderToken) return;
+        manatecGrid.classList.remove('animando');
+        manatecImgs.forEach(img => {
+            img.style.transition = '';
+            img.style.transform = '';
+            img.style.zIndex = '';
+        });
+    }, DURACION_ANIM + 20);
+
+    actualizarVisor();
+    actualizarBotones();
+}
+
+if (manatecGrid && manatecImgs.length > 0) {
+    // Estado inicial: ventanas 4 a 7 con img02..img05, visor en img02-central
+    renderCarousel(false);
+
     if (viewerPrev) {
-        viewerPrev.addEventListener('click', function() {
-            currentIndex = (currentIndex - 1 + manatecThumbs.length) % manatecThumbs.length;
-            manatecViewer.src = imagenCentral(currentIndex);
-            manatecViewer.alt = manatecThumbs[currentIndex].alt;
+        viewerPrev.addEventListener('click', function () {
+            if (activeIndex > 0) {
+                activeIndex--;
+                renderCarousel(true);
+            }
         });
     }
-    
+
     if (viewerNext) {
-        viewerNext.addEventListener('click', function() {
-            currentIndex = (currentIndex + 1) % manatecThumbs.length;
-            manatecViewer.src = imagenCentral(currentIndex);
-            manatecViewer.alt = manatecThumbs[currentIndex].alt;
+        viewerNext.addEventListener('click', function () {
+            if (activeIndex < TOTAL_IMGS - 1) {
+                activeIndex++;
+                renderCarousel(true);
+            }
         });
     }
 }
