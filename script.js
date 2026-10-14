@@ -1,20 +1,20 @@
 
 // Define la fecha y hora exacta en la que se bloqueará el acceso
 // Formato: AAAA-MM-DDTHH:MM:SS
-const fechaBloqueo = new Date("2026-10-14T13:46:00").getTime(); 
 
-const tiempoActual = new Date().getTime();
+// const fechaBloqueo = new Date("2026-10-14T13:46:00").getTime(); 
+// const tiempoActual = new Date().getTime();
 
-if (tiempoActual > fechaBloqueo) {
-    document.body.innerHTML = `
-        <div style="display:flex; justify-content:center; align-items:center; height:100vh; font-family:sans-serif; text-align:center; background:#111; color:#fff;">
-            <div>
-                <h1>Acceso Finalizado</h1>
-                <p>El tiempo de visualización para esta vista previa ha expirado.</p>
-            </div>
-        </div>
-    `;
-}
+// if (tiempoActual > fechaBloqueo) {
+//     document.body.innerHTML = `
+//         <div style="display:flex; justify-content:center; align-items:center; height:100vh; font-family:sans-serif; text-align:center; background:#111; color:#fff;">
+//             <div>
+//                 <h1>Acceso Finalizado</h1>
+//                 <p>El tiempo de visualización para esta vista previa ha expirado.</p>
+//             </div>
+//         </div>
+//     `;
+// }
 
 
 
