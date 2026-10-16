@@ -1,3 +1,25 @@
+/*========== ORDEN DE LAS SECCIONES ==========*/
+/*
+---> NAVBAR -> 86
+---> 
+---> INICIO (HERO CARRUSEL) -> 283
+---> (INICIO) SECCIONES -> 471
+---> SERVICIOS -> 499
+---> MAS VENDIDO -> 559
+---> CATEGORIAS -> 748
+---> 
+---> NOSOTROS -> 1020
+---> CONTACTO -> 1076
+---> REDES SOCIALES -> 1143
+---> FOOTER -> 1175
+---> WHATSAPP BUTTON -> 1190
+---> LOGIN -> 1345
+
+---> RESPONSIVE -> 1576    (Lo ultimo)
+
+*/
+
+
 * {
     margin: 0;
     padding: 0;
@@ -56,6 +78,7 @@ html {
     --whatsapp-bg: linear-gradient(145deg, #ffffff, #f8f8f8);
     --whatsapp-border: rgba(37, 211, 102, 0.4);
     --gold: #d4a017;
+    --colorxd: yellow;
 }
 
 html, body {
@@ -206,14 +229,15 @@ nav ul li.dropdown:hover > a::after {
     transform: translateY(-60%) rotate(-135deg);
 }
 
+/* Ventana Desplegable de CATEGORIAS*/
 .dropdown-menu {
     display: none;
     position: absolute;
     top: calc(100% + 10px);
-    left: 50%;
+    left: 40%;
     transform: translateX(-50%);
     background: var(--bg-card);
-    border: 2px solid var(--border-color);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 0.5rem 0;
     min-width: 260px;
@@ -257,7 +281,7 @@ nav ul li.dropdown:hover .dropdown-menu {
     height: 12px;
 }
 
-/* ===== HERO CARRUSEL ===== */
+/* ===== (INICIO) HERO CARRUSEL ===== */
 #inicio {
     scroll-margin-top: 108px;
 }
@@ -445,7 +469,7 @@ nav ul li.dropdown:hover .dropdown-menu {
     background: linear-gradient(135deg, rgba(255, 107, 53, 0.85), rgba(0, 212, 255, 0.85));
 }
 
-/* ===== SECCIONES ===== */
+/* ===== (INICIO) SECCIONES ===== */
 section {
     padding: 5rem 2rem;
     max-width: 1200px;
@@ -480,7 +504,7 @@ section {
 .servicios-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 2rem;
+    gap:2rem;
 }
 
 .card {
@@ -532,7 +556,7 @@ section {
     font-size: 0.95rem;
 }
 
-/* ===== PRODUCTOS ===== */
+/* ===== MAS VENDIDO ===== */
 #productos {
     background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
     max-width: 100%;
@@ -828,16 +852,42 @@ section {
     align-items: center;
 }
 
+/* Ventanita 4: opacidad completa */
+.manatec-item:nth-child(4) {
+    width: 130px;
+    justify-self: center;
+    opacity: 100%;
+}
+
 /* Todas las ventanitas menos la numero 4 */
 .manatec-item:not(:nth-child(4)) {
     width: 80px;
     justify-self: center;
+    opacity: 40%;
 }
 
-/* Ventanita 4: se mantiene en su tamaño original (Ancho) */
-.manatec-item:nth-child(4) {
-    width: 130px;
+/* Ventanita 1: opacidad */
+.manatec-item:nth-child(1) {
     justify-self: center;
+    opacity: 0%;
+}
+
+/* Ventanita 7: opacidad */
+.manatec-item:nth-child(7) {
+    justify-self: center;
+    opacity: 0%;
+}
+
+/* Ventanita 2: opacidad */
+.manatec-item:nth-child(2) {
+    justify-self: center;
+    opacity: 10%;
+}
+
+/* Ventanita 6: opacidad */
+.manatec-item:nth-child(6) {
+    justify-self: center;
+    opacity: 10%;
 }
 
 /* Ventanita 4: se mantiene en su tamaño original (Altura) */
@@ -846,18 +896,18 @@ section {
 }
 
 .manatec-item {
-    background: linear-gradient(145deg, var(--bg-card), var(--bg-card-hover));
-    border: 1px solid var(--border-light);
+    background: transparent;
+    border: 1px solid none;
     border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
 }
 
 .manatec-img {
     width: 100%;
     height: 70px;
-    background: rgba(128, 128, 128, 0.15);
-    border-bottom: 1px solid var(--border-light);
+    background: rgba(128, 128, 128, 0.15);   /*-- ACA (enlace) --*/
+    border-bottom: 1px solid none;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -873,14 +923,14 @@ section {
 
 /* Imágenes de las 6 ventanitas: mantienen su tamaño actual (no crecen) */
 .manatec-item:not(:nth-child(4)) .manatec-img img {
-    max-height: 60px;
+    max-height: 50px;
 }
 
 .manatec-viewer {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10rem;
+    gap: 5rem;
     padding: 1.3rem 0;
     margin-top: -3rem;
 }
@@ -893,19 +943,39 @@ section {
     border-radius: 12px;
 }
 
+/* Caja del visor: las imágenes se apilan; la que sale se desliza y se oculta,
+   la que entra se desliza desde el lado opuesto (como las slides del inicio) */
+.manatec-viewer-box {
+    position: relative;
+    width: 777px;
+    height: 541px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.manatec-viewer-box img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    max-width: none;
+    box-sizing: border-box;
+    border: 1px solid var(--border-color);
+    transition: transform 1100ms cubic-bezier(0.22, 1, 0.36, 1), opacity 1100ms ease; /* misma duración que DURACION_ANIM (script.js) */
+}
+
 .viewer-btn {
     background: linear-gradient(135deg, rgba(255, 107, 53, 0.50), rgba(0, 212, 255, 0.50));
     border: 1px solid #000;
     color: #000;
     width: 48px;
     height: 48px;
-    border-radius: 50%;
-    font-size: 1.4rem;
+    border-radius: 30%;
+    font-size: 1.3rem;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s;
+    transition: all 0.15s;
     flex-shrink: 0;
     transform: translateY(-5rem);
     box-shadow: 0 5px 15px rgba(255, 107, 53, 0.3);
@@ -924,15 +994,25 @@ section {
     pointer-events: none;
 }
 
-/* Durante la animación del carrusel las imágenes se deslizan fuera de su ventanita */
-.manatec-grid.animando .manatec-item,
+/* Durante la animación las imágenes se deslizan POR ENCIMA de las ventanitas.
+   Se quita overflow y box-shadow de la tarjeta para que no se recorten
+   las imágenes, y se aplica clip-path redondeado a las imágenes para que
+   no sobresalgan como cuadrados de las esquinas curveadas */
+.manatec-grid.animando .manatec-item {
+    overflow: visible;
+    /* box-shadow: none; */
+    background: rgba(128, 128, 128, 0.15);  /*-- ACA (enlace) --*/
+}
+
 .manatec-grid.animando .manatec-img {
     overflow: visible;
+    background: transparent;             /*--NO CAMBIAR ACA--*/
 }
 
 .manatec-grid.animando .manatec-img img {
     position: relative;
     z-index: 5;
+    /* background: green; */
 }
 
 .manatec-item .info {

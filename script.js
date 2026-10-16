@@ -21,6 +21,8 @@
 
 // ===== CARRUSEL DE IMÁGENES - MANATEC =====
 const manatecViewer = document.getElementById('viewer-img');
+const manatecViewer2 = document.getElementById('viewer-img-2');
+const manatecViewerBox = document.querySelector('.manatec-viewer-box');
 const manatecGrid = document.querySelector('.manatec-grid');
 const manatecItems = document.querySelectorAll('.manatec-item');
 const manatecImgs = Array.from(document.querySelectorAll('.manatec-thumb'));
@@ -29,9 +31,11 @@ const viewerNext = document.querySelector('.viewer-next');
 
 const TOTAL_IMGS = manatecImgs.length; // 5 imágenes
 const VENTANA_CENTRO = 4;              // la ventanita grande (1 a 7)
-const DURACION_ANIM = 800;             // ms
+const DURACION_ANIM = 1100;            // ms
 
 let activeIndex = 0;                   // arranca con img02 en la ventanita 4
+let activeIndexPrevio = activeIndex;   // para saber la dirección del visor
+let visorActual = 0;                   // capa visible del visor (0 o 1)
 let renderToken = 0;                   // cancela limpiezas de renders anteriores
 const animSalida = new Map();          // img -> animación de desvanecido de salida
 
@@ -65,11 +69,55 @@ function asignarImagenes() {
 // El visor grande siempre refleja la imagen de la ventanita 4:
 // si esa miniatura tiene "data-center" (ej. img02-central), se muestra esa;
 // si no, se muestra la propia miniatura.
-function actualizarVisor() {
+// Al cambiar, la imagen se desliza (como las slides del inicio):
+// entra por la derecha con ► y por la izquierda con ◄.
+const visorSlides = [manatecViewer, manatecViewer2];
+
+function actualizarVisor(animar, dir) {
     const img = manatecImgs[activeIndex];
-    if (!img || !manatecViewer) return;
-    manatecViewer.src = img.dataset.center || img.src;
-    manatecViewer.alt = img.alt;
+    if (!img || !manatecViewer || !manatecViewer2) return;
+    const src = img.dataset.center || img.src;
+
+    if (!animar) {
+        // Estado inicial: mostrar directamente, sin animación
+        manatecViewer.style.transition = 'none';
+        manatecViewer2.style.transition = 'none';
+        manatecViewer.style.transform = 'translateX(0) scale(1)';
+        manatecViewer.style.opacity = '1';
+        manatecViewer.style.zIndex = '2';
+        manatecViewer2.style.transform = 'translateX(0) scale(0)';
+        manatecViewer2.style.opacity = '0';
+        manatecViewer2.style.zIndex = '1';
+        manatecViewer.src = src;
+        manatecViewer.alt = img.alt;
+        visorActual = 0;
+        return;
+    }
+
+    const nueva = visorSlides[1 - visorActual];
+    const vieja = visorSlides[visorActual];
+
+    nueva.src = src;
+    nueva.alt = img.alt;
+    nueva.style.zIndex = '2';
+    vieja.style.zIndex = '1';
+
+    // La imagen nueva entra desde el lado opuesto creciendo (scale 0 -> 1);
+    // la actual sale hacia el lado contrario encogiéndose (scale 1 -> 0)
+    // hasta desaparecer. Nunca quedan dos visibles a la vez.
+    nueva.style.transition = 'none';
+    nueva.style.transform = `translateX(${dir * 100}%) scale(0)`;
+    nueva.style.opacity = '1';
+    void manatecViewerBox.offsetHeight; // forzar reflow
+
+    nueva.style.transition = '';
+    nueva.style.transform = 'translateX(0) scale(1)';
+
+    vieja.style.transition = '';
+    vieja.style.transform = `translateX(${-dir * 100}%) scale(0)`;
+    vieja.style.opacity = '0';
+
+    visorActual = 1 - visorActual;
 }
 
 // Sin loop: los botones se desactivan en los extremos
@@ -91,10 +139,15 @@ function renderCarousel(animar) {
 
     if (!animar) {
         asignarImagenes();
-        actualizarVisor();
+        actualizarVisor(animar, 1);
         actualizarBotones();
         return;
     }
+
+    // Dirección del movimiento del visor: 1 = siguiente (entra por la derecha),
+    // -1 = anterior (entra por la izquierda)
+    const dir = activeIndex >= activeIndexPrevio ? 1 : -1;
+    activeIndexPrevio = activeIndex;
 
     // FLIP: guardar posiciones actuales de las imágenes visibles
     const rectosPrevios = new Map();
@@ -180,7 +233,7 @@ function renderCarousel(animar) {
         });
     }, DURACION_ANIM + 20);
 
-    actualizarVisor();
+    actualizarVisor(animar, dir);
     actualizarBotones();
 }
 
